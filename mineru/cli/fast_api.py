@@ -49,6 +49,12 @@ from mineru.cli.public_http_client_policy import (
     warn_if_public_http_client_policy as _warn_if_public_http_client_policy,
 )
 from mineru.cli.output_paths import resolve_parse_dir
+from mineru.cli.parse_progress import (
+    get_current_progress,
+    install_tqdm_progress_hook,
+    progress_task_finished,
+    progress_task_started,
+)
 from mineru.cli.api_protocol import (
     API_PROTOCOL_VERSION,
     DEFAULT_MAX_CONCURRENT_REQUESTS,
@@ -262,6 +268,7 @@ app = create_app()
 
 
 async def startup_app_state(app: FastAPI) -> "AsyncTaskManager":
+    install_tqdm_progress_hook()
     task_manager = AsyncTaskManager(app)
     await task_manager.start()
     try:
@@ -1171,12 +1178,16 @@ class AsyncTaskManager:
             )
         ]
         config = getattr(self.app.state, "config", {})
-        await run_parse_job(
-            output_dir=task.output_dir,
-            uploads=uploads,
-            request_options=task,
-            config=config,
-        )
+        progress_task_started(task.task_id, task.file_names)
+        try:
+            await run_parse_job(
+                output_dir=task.output_dir,
+                uploads=uploads,
+                request_options=task,
+                config=config,
+            )
+        finally:
+            progress_task_finished(task.task_id)
         task.status = TASK_COMPLETED
         task.completed_at = utc_now_iso()
         self._signal_task_event(task.task_id)
@@ -1347,6 +1358,19 @@ async def get_async_task_result(
         return_original_file=task.return_original_file,
         zip_filename=f"{task.task_id}.zip",
     )
+
+
+@app.get(path="/progress/current")
+async def get_current_parse_progress():
+    """Live progress of the task currently being parsed (local addition).
+
+    Returns the most recent task's progress entry — callers should match
+    `file_names` against their own upload before trusting the percent.
+    """
+    entry = get_current_progress()
+    if entry is None:
+        raise HTTPException(status_code=404, detail="No parse in progress")
+    return entry
 
 
 @app.get(path="/health")
