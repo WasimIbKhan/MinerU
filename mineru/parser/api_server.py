@@ -58,7 +58,7 @@ from ..model.vlm.errors import is_fatal_engine_error
 from ..utils.logger import configure_global_log_level
 from ..utils.stdio import configure_standard_streams
 from ..version import __version__
-from . import parse_async
+from . import parse_async, parse_progress
 from .base import ParseResult
 from .page_range import (
     PAGE_RANGE_DESCRIPTION,
@@ -505,6 +505,10 @@ class JobProgress(BaseModel):
     completed: int = 0
     failed: int = 0
     total: int = 0
+    percent: int | None = None
+    stage: str | None = None
+    pages_done: int | None = None
+    pages_total: int | None = None
 
 
 class FileParseInfo(BaseModel):
@@ -1845,6 +1849,9 @@ async def _run_job(
         else:
             rec.status = "completed"
     rec.finished_at = JobStore._now()
+
+
+_run_job = parse_progress.track(_run_job)
 
 
 # ═══════════════════════════════════════════════════════════════════════
