@@ -10,4 +10,6 @@ if "%MINERU_UPLOAD_DIR%"=="" set "MINERU_UPLOAD_DIR=%ROOT%uploads"
 cd /d "%ROOT%"
 if not exist logs mkdir logs
 set "PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
+REM 128-page windows batch formula recognition better (measured 2026-10-13).
+if "%MINERU_PROCESSING_WINDOW_SIZE%"=="" set "MINERU_PROCESSING_WINDOW_SIZE=128"
 "%ROOT%.venv\Scripts\mineru-api.exe" --host 127.0.0.1 --port %MINERU_PORT% --tier basic --no-advanced --upload-dir "%MINERU_UPLOAD_DIR%" >> "logs\mineru-api-%MINERU_PORT%.log" 2>&1

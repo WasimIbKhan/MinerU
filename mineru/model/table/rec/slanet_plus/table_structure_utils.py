@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from docvortex.image import resize_image
+from mineru.utils.image_resize import resize_image
 import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union

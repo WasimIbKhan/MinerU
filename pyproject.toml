@@ -93,6 +93,9 @@ test = [
     "fuzzywuzzy",
     "tomli; python_version < '3.11'",
 ]
+opencv = [
+    "opencv-python-headless>=4.10,<6",
+]
 torch = [
     "torch>=2.7.0,<3",
     "torchvision",

@@ -1,6 +1,6 @@
 # Copyright (c) Opendatalab. All rights reserved.
 
-from docvortex.image import resize_image
+from mineru.utils.image_resize import resize_image
 import numpy as np
 from PIL import Image
 from tqdm import tqdm

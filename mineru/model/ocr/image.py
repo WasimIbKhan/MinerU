@@ -2,7 +2,8 @@
 """OCR 输入图像解码、遮罩与旋转裁剪。"""
 
 from __future__ import annotations
-from docvortex.image import decode_image, perspective_matrix, resize_image, warp_image
+from docvortex.image import decode_image, perspective_matrix, warp_image
+from mineru.utils.image_resize import resize_image
 
 
 from typing import Any

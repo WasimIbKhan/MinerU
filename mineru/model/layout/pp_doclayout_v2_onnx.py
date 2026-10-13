@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import yaml
-from docvortex.image import resize_image
+from mineru.utils.image_resize import resize_image
 from loguru import logger
 from PIL import Image
 from tqdm import tqdm

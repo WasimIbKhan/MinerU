@@ -1,6 +1,7 @@
 # Copyright (c) Opendatalab. All rights reserved.
 
-from docvortex.image import contour_area, morphology, trace_contours, minimum_rectangle, resize_image, rotation_matrix, transform_points, warp_image
+from docvortex.image import contour_area, morphology, trace_contours, minimum_rectangle, rotation_matrix, transform_points, warp_image
+from mineru.utils.image_resize import resize_image
 import copy
 import math
 from typing import Optional, Dict, Any, Tuple

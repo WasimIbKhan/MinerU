@@ -1,6 +1,7 @@
 # Copyright (c) Opendatalab. All rights reserved.
 
-from docvortex.image import gray_image, resize_image
+from docvortex.image import gray_image
+from mineru.utils.image_resize import resize_image
 from PIL import Image, ImageOps
 from transformers.image_processing_utils import BaseImageProcessor
 import numpy as np
