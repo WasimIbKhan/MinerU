@@ -57,4 +57,59 @@ def install() -> None:
     _DocxNumbering._detect_heading_list_numids = detect_outlined_heading_lists
 
 
+# docvortex starts a new top-level list whenever the numbering id changes, so a
+# sub-list that uses its own numbering definition (common in Word and pandoc
+# output) loses its depth. An item whose numId differs from the open list but
+# sits deeper than an open list level nests under it, and an item that returns
+# to an open level of its own numId continues that level.
+
+
+def _owners(converter: Any) -> dict[int, int]:
+    state = converter.__dict__.get("_list_block_numids")
+    if state is None or state[0] is not converter.pages:
+        state = converter._list_block_numids = (converter.pages, {})
+    return state[1]
+
+
+def _adopt_open_levels(converter: Any, numid: int, ilevel: int) -> None:
+    owners = _owners(converter)
+    kept = []
+    for block in converter.list_block_stack:
+        if block["ilevel"] < ilevel:
+            kept.append(block)
+        elif block["ilevel"] == ilevel and owners.get(id(block)) == numid:
+            kept.append(block)
+            break
+        else:
+            break
+    if kept:
+        converter.list_block_stack = kept
+        converter.pre_num_id = numid
+        converter.pre_ilevel = kept[-1]["ilevel"]
+
+
+def install_nesting() -> None:
+    try:
+        from docvortex.analyzers.native.office.docx.numbering import _DocxNumbering
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(f"docx list nesting fix disabled: {exc}")
+        return
+    add_item = _DocxNumbering._add_list_item
+    if getattr(add_item, "_nests_across_numids", False):
+        return
+
+    def add_list_item(self: Any, *, numid: int, ilevel: int, **kwargs: Any) -> Any:
+        if self.pre_num_id not in (-1, numid) and self.list_block_stack:
+            _adopt_open_levels(self, numid, ilevel)
+        result = add_item(self, numid=numid, ilevel=ilevel, **kwargs)
+        owners = _owners(self)
+        for block in self.list_block_stack:
+            owners.setdefault(id(block), numid)
+        return result
+
+    add_list_item._nests_across_numids = True
+    _DocxNumbering._add_list_item = add_list_item
+
+
 install()
+install_nesting()
