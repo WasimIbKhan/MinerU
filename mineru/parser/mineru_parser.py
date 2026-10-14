@@ -22,7 +22,7 @@ from ..utils.logger import configure_global_log_level
 from ..types import FILE_SUFFIXES, FileSuffix, MiddleJson, ModelJson, PageInfo, Tier
 from .base import DocumentParser, ParseResult
 from . import docx_lists  # noqa: F401  (local patch: bullet lists stay lists)
-from . import docx_package  # noqa: F401  (local patch: w: prefix rebind)
+from . import docx_package  # noqa: F401  (local patch: w: prefix rebind, transparent content controls)
 from .tier import effort_for_tier
 
 logger = logging.getLogger(__name__)
