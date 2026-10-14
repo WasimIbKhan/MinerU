@@ -24,6 +24,7 @@ from .base import DocumentParser, ParseResult
 from . import docx_lists  # noqa: F401  (local patch: bullet lists stay lists)
 from . import docx_package  # noqa: F401  (local patch: w: prefix rebind, transparent content controls)
 from . import docx_notes  # noqa: F401  (local patch: footnotes and endnotes)
+from . import docx_headings  # noqa: F401  (local patch: inherited heading styles, headings end lists)
 from .tier import effort_for_tier
 
 logger = logging.getLogger(__name__)
